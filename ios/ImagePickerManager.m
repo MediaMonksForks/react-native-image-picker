@@ -196,7 +196,10 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
         [self checkCameraPermissions:^(BOOL granted) {
             if (!granted) {
                 self.callback(@[@{@"error": @"Camera permissions not granted"}]);
+                //Permssion Alert for camera access
+                [self showPermissionAlert:@"Camera Access Disabled" text:@"In order to use your camera to upload a photo, please open app settings and switch toggle to active"];
                 return;
+                
             }
 
             showPickerViewController();
@@ -206,13 +209,17 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
         [self checkPhotosPermissions:^(BOOL granted) {
             if (!granted) {
                 self.callback(@[@{@"error": @"Photo library permissions not granted"}]);
+                //Permssion Alert for photo library
+                [self showPermissionAlert:@"Photos Access Disabled" text:@"In order upload a photo from you photolibrary the app need access to your photolibrary, please open app settings and set photo access to 'Read and Write'"];
                 return;
+                
             }
 
             showPickerViewController();
         }];
     }
 }
+
 
 - (NSString * _Nullable)originalFilenameForAsset:(PHAsset * _Nullable)asset assetType:(PHAssetResourceType)type {
     if (!asset) { return nil; }
@@ -666,7 +673,54 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
     CGImageRelease(cgimg);
     return img;
 }
+-(BOOL)showPermissionAlert:(NSString*)title text:(NSString*)text{
+    NSDictionary *permissionDenied = [self.options objectForKey:@"permissionDenied"];
+    NSLog(@"Coming here permissions");
+    if(!permissionDenied){
+        return NO;
+    }
+    NSLog(@"Permission Denied , %@", permissionDenied);
+//    NSString *title = [permissionDenied objectForKey:@"title"];
+//    NSString *text = [permissionDenied objectForKey:@"text"];
+    NSString *settingTitle = [permissionDenied objectForKey:@"reTryTitle"];
+    NSString *okTitle = [permissionDenied objectForKey:@"okTitle"];
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:text preferredStyle:UIAlertControllerStyleAlert];
 
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *openSettingAction = [UIAlertAction actionWithTitle:settingTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if([[UIApplication sharedApplication] canOpenURL: [NSURL URLWithString:UIApplicationOpenSettingsURLString]]){
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        }else{
+            NSLog(@"The application cannot open Settings for unknow reasons");
+        }
+    }];
+    [alertController addAction:cancelAction];
+    [alertController addAction:openSettingAction];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *root = RCTPresentedViewController();
+        
+        /* On iPad, UIAlertController presents a popover view rather than an action sheet like on iPhone. We must provide the location
+         of the location to show the popover in this case. For simplicity, we'll just display it on the bottom center of the screen
+         to mimic an action sheet */
+        alertController.popoverPresentationController.sourceView = root.view;
+        alertController.popoverPresentationController.sourceRect = CGRectMake(root.view.bounds.size.width / 2.0, root.view.bounds.size.height, 1.0, 1.0);
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            alertController.popoverPresentationController.permittedArrowDirections = 0;
+            for (id subview in alertController.view.subviews) {
+                if ([subview isMemberOfClass:[UIView class]]) {
+                    ((UIView *)subview).backgroundColor = [UIColor whiteColor];
+                }
+            }
+        }
+        
+        [root presentViewController:alertController animated:YES completion:nil];
+    });
+    
+    return YES;
+}
 - (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *) filePathString
 {
     NSURL* URL= [NSURL fileURLWithPath: filePathString];
