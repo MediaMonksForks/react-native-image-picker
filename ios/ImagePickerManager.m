@@ -195,7 +195,7 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
     if (target == RNImagePickerTargetCamera) {
         [self checkCameraPermissions:^(BOOL granted) {
             if (!granted) {
-                self.callback(@[@{@"error": @"Camera permissions not granted"}]);
+                self.callback(@[@{@"permission": @"Camera permissions not granted"}]);
                 //Permssion Alert for camera access
                 [self showPermissionAlert:@"Camera Access Disabled" text:@"In order to use your camera to upload a photo, please open app settings and switch toggle to active"];
                 return;
@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
     else { // RNImagePickerTargetLibrarySingleImage
         [self checkPhotosPermissions:^(BOOL granted) {
             if (!granted) {
-                self.callback(@[@{@"error": @"Photo library permissions not granted"}]);
+                self.callback(@[@{@"permission": @"Photo library permissions not granted"}]);
                 //Permssion Alert for photo library
                 [self showPermissionAlert:@"Photos Access Disabled" text:@"In order upload a photo from you photolibrary the app need access to your photolibrary, please open app settings and set photo access to 'Read and Write'"];
                 return;
