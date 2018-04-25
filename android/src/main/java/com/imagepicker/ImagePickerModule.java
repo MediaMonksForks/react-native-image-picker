@@ -55,8 +55,7 @@ import static com.imagepicker.utils.MediaUtils.*;
 import static com.imagepicker.utils.MediaUtils.createNewFile;
 import static com.imagepicker.utils.MediaUtils.getResizedImage;
 
-public class ImagePickerModule extends ReactContextBaseJavaModule
-        implements ActivityEventListener
+public class ImagePickerModule extends ReactContextBaseJavaModule implements ActivityEventListener
 {
 
   public static final int REQUEST_LAUNCH_IMAGE_CAPTURE    = 13001;

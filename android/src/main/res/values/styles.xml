@@ -1,0 +1,10 @@
+<resources>
+    <style name="DataPickerTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowTitleStyle">@style/DataPickerDialogTitle</item>
+    </style>
+
+    <style name="DataPickerDialogTitle" parent="@android:style/TextAppearance.Holo.DialogWindowTitle">
+        <item name="android:textColor">@android:color/holo_green_dark</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+</resources>
