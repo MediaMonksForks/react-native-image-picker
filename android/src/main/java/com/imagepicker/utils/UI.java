@@ -105,6 +105,7 @@ public class UI {
                         default:
                             callback.onCustomButton(reference.get(), action);
                     }
+                    dialog.dismiss();
                 }
             });
 
